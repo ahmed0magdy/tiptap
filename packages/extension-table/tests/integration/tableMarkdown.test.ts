@@ -233,6 +233,26 @@ describe('table markdown line breaks', () => {
     expect(serialized).toContain('foo<br><br>bar')
   })
 
+  it('round trips hard breaks at the start of a cell and in a row', () => {
+    const paragraph = {
+      type: 'paragraph',
+      content: [
+        { type: 'hardBreak' },
+        { type: 'text', text: 'foo' },
+        { type: 'hardBreak' },
+        { type: 'hardBreak' },
+        { type: 'hardBreak' },
+        { type: 'text', text: 'bar' },
+      ],
+    }
+
+    const serialized = markdownManager.serialize(tableDoc([cell([paragraph])]))
+    const bodyRow = markdownManager.parse(serialized).content?.[0]?.content?.[1]
+
+    expect(serialized).toContain('| <br>foo<br><br><br>bar |')
+    expect(bodyRow?.content?.[0]?.content?.[0]).toEqual(paragraph)
+  })
+
   it('round trips <br> inside cells', () => {
     const markdown = `| desc |
 | --- |

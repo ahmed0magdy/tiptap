@@ -64,7 +64,12 @@ export const HardBreak = Node.create<HardBreakOptions>({
     return '\n'
   },
 
-  renderMarkdown: () => `  \n`,
+  renderMarkdown: (node, _helpers, context) => {
+    // Two trailing spaces alone on a line read back as a blank line
+    const isAloneOnLine = context.index === 0 || context.previousNode?.type === node.type
+
+    return isAloneOnLine ? '\\\n' : '  \n'
+  },
 
   parseMarkdown: () => {
     return {

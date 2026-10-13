@@ -134,7 +134,10 @@ export function renderTableToMarkdown(
 
         // Cells have to stay on a single line, so line breaks become <br> tags.
         // The parser already turns <br> back into hard breaks, so this round trips.
-        const singleLine = collapseWhitespace(raw.replace(/[ \t]*\r?\n[ \t]*/g, '<br>'))
+        // A lone backslash line is a hard break, which its <br> already covers.
+        const singleLine = collapseWhitespace(
+          raw.replace(/(^|\n)\\(?=\r?\n)/g, '$1').replace(/[ \t]*\r?\n[ \t]*/g, '<br>'),
+        )
         const text = escapePipesInCellText(singleLine)
         const isHeader = cellNode.type === 'tableHeader'
         const align = normalizeTableCellAlignFromAttributes(cellNode.attrs)

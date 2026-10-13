@@ -3,6 +3,7 @@ export * as bulletListNumericPunctuation from './bullet-list-numeric-punctuation
 export * as customAtom from './custom-atom.js'
 export * as customBlock from './custom-block.js'
 export * as customInline from './custom-inline.js'
+export * as hardBreakConsecutive from './hard-break-consecutive.js'
 export * as hardBreakMarks from './hard-break-marks.js'
 export * as linkWithTitle from './link-with-title.js'
 export * as linkWithoutTitle from './link-without-title.js'
