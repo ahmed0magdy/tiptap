@@ -1,11 +1,11 @@
-STATUS: DONE - #8478 fix pushed to contrib/markdown-consecutive-hard-breaks; one decision left for you
-UPDATED: 2026-10-13T13:45:22Z
+STATUS: DONE - #8478 fix pushed as a713bf2 (authored by ahmed0magdy), ready for your review
+UPDATED: 2026-10-13T13:49:45Z
 BRANCH: contrib/markdown-consecutive-hard-breaks
 MODE: auto
 
 ## Done: #8478 (consecutive hard breaks lost in a Markdown round trip)
 
-Pushed `contrib/markdown-consecutive-hard-breaks` to origin as one commit, `1d51eea`, on top of `main` (5e4c112). **No PR opened.**
+Pushed `contrib/markdown-consecutive-hard-breaks` to origin as one commit, **`a713bf2`**, on top of `main` (5e4c112), authored by you. **No PR opened.**
 
 ### Results (final tree)
 - `vp run lint`: 0 warnings, 0 errors. `vp fmt --check` on changed files: clean. The pre-commit hook (`vp check --fix`) and commitlint passed.
@@ -15,13 +15,17 @@ Pushed `contrib/markdown-consecutive-hard-breaks` to origin as one commit, `1d51
 - `test:e2e` (Chromium): **689 passed, 3 failed.** The 3 failures are `demos/src/Examples/Default/index.spec.ts:107` "should set the correct type when Task list is pressed" for React, Vue and Svelte. **They fail the same way on unchanged `origin/main`** (expected "Hello world", got "Task item checkbox for Hello worldHello world"). This is the existing upstream issue #8456, not this change.
   - How e2e was run: the repo's Playwright wants `chromium_headless_shell-1234`, which this VM doesn't have, so a plain `vp run test:e2e` failed all 692 tests before any test code ran. I reran with a temporary config in my scratch folder that points at the preinstalled Chromium (build 1194). No repo files were changed. Firefox was not run.
 
-### Decision for you
-- **A break at the end of a paragraph is still lost.** I confirmed the bug: `a  \n` reads back as the text `"a  "`. A backslash can't fix it, because CommonMark ignores a hard break at the end of a block (`a\` reads back as a literal backslash). Only an HTML `<br>` would round-trip, which is outside the agreed approach. I left it unchanged. Options: mention it in the PR as a known limit, or ask maintainers whether they want `<br>` there in a follow-up.
+### End-of-paragraph break: decided
+- Per your decision, it's left out of this PR and listed as a known limit in the PR notes below.
+
+### Authorship: done
+- Re-authored as `ahmed0magdy <110637215+ahmed0magdy@users.noreply.github.com>` (author and committer). This repo's git config is set to the same identity.
+- The `Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>` trailer is kept; the `Claude-Session:` trailer is removed.
+- Content is identical to the old commit `1d51eea` (empty tree diff). Pushed with `--force-with-lease` (old SHA `1d51eea` -> new SHA `a713bf2`).
+- Quick checks after amending: lint 0 warnings / 0 errors; hard-break, table and markdown tests 445 passed; `fallow audit` pass.
 
 ### Before you open the upstream PR
 - **Comment on #8478 and get assigned first.** CONTRIBUTING requires the PR's issue to be assigned to you.
-- **Commit author:** the commit is authored by the VM default `Claude <noreply@anthropic.com>`. Run `git commit --amend --reset-author` so you are the author, then push with `--force-with-lease` (it's your own branch).
-- **Trailers:** the commit has `Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>`, in the style of recent upstream commits, plus a `Claude-Session:` link to this private session. You can drop the session line when amending.
 - **Review the diff yourself** so you can honestly tick the template's Responsibility box.
 
 ---
@@ -38,7 +42,7 @@ Pushed `contrib/markdown-consecutive-hard-breaks` to origin as one commit, `1d51
 - Fix (`packages/extension-hard-break/src/hard-break.ts`): when a break would be alone on its line (first in its parent, or right after another break), it uses the CommonMark backslash hard break, `\` + newline. Every other break keeps the two-space form, so normal output is byte-identical to before.
 - No parser change: marked already parses `\` + newline as a hard break.
 - Table cells (`packages/extension-table/src/table/utilities/markdown.ts`): cells turn newlines into `<br>`. They now drop the lone `\` line, so table output is unchanged (`foo<br><br>bar`, not `foo<br>\<br>bar`). An existing table test caught this.
-- Known limit: a break at the end of a paragraph is still dropped. CommonMark ignores a hard break at the end of a block, so no Markdown syntax keeps it; only `<br>` would.
+- Known limit: a hard break at the end of a paragraph is still dropped. CommonMark drops a hard break at the end of a block, so no Markdown syntax keeps it; only `<br>` would. If maintainers want it, a follow-up can emit `<br>` there. This PR leaves it out to keep the scope small.
 - How to review:
   - The new fixture `packages/markdown/tests/fixtures/markdown/hard-break-consecutive.ts` covers 1, 2 and 3 breaks, a break at the start of a paragraph, and bold and italic text. `conversion.test.ts` checks it in both directions with exact bytes.
   - The existing `hard-break-marks` fixture is unchanged and still passes, which shows single-break output didn't change.
